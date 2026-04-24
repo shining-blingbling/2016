@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ARCHIVES | 2016 政治獻金透明化資料庫</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-paper: #F4F1EA; /* 仿舊手工紙色 */
+            --gold: #C5A059;     /* 香檳金 */
+            --dark-gold: #947436;
+            --old-brown: #2C241E; /* 賽璐璐深褐 */
+            --text-main: #33322E;
+            --border-soft: rgba(44, 36, 30, 0.1);
+        }
+
+        /* 全域樣式 */
+        body {
+            background-color: var(--bg-paper);
+            color: var(--text-main);
+            font-family: 'Noto Serif TC', serif;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .logo {
+            font-family: 'Playfair Display', serif;
+            color: var(--old-brown);
+            letter-spacing: -0.02em;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Landing Page 佈局 */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        #landing-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 80px;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--gold);
+            margin-bottom: 100px;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        .hero-section p {
+            max-width: 600px;
+            margin: 20px auto;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        /* 搜尋 CTA */
+        .search-area {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            padding: 8px;
+            border: 1px solid var(--gold);
+            display: flex;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+        .search-area input {
+            flex: 1;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .search-area button {
+            background: var(--old-brown);
+            color: var(--gold);
+            border: none;
+            padding: 0 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .search-area button:hover {
+            background: var(--text-main);
+            color: white;
+        }
+
+        .quick-links {
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .quick-links span { color: #999; }
+        .quick-links a {
+            color: var(--dark-gold);
+            text-decoration: none;
+            margin: 0 10px;
+            border-bottom: 1px solid transparent;
+        }
+
+        .quick-links a:hover { border-bottom: 1px solid var(--dark-gold); }
+
+        /* 編輯精選 */
+        .editors-picks {
+            margin-top: 120px;
+            width: 100%;
+            border-top: 1px solid var(--border-soft);
+            padding-top: 40px;
+        }
+
+        .picks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .pick-card {
+            background: white;
+            padding: 30px;
+            border: 1px solid var(--border-soft);
+            cursor: pointer;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .pick-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+        }
+
+        .pick-card .tag {
+            font-size: 0.7rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* 結果列表頁 */
+        #results-page {
+            padding: 60px 0;
+        }
+
+        .summary-bar {
+            background: var(--old-brown);
+            color: var(--gold);
+            padding: 30px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .summary-bar span { display: block; font-size: 0.8rem; opacity: 0.7; }
+        .summary-bar strong { font-family: 'Playfair Display'; font-size: 1.8rem; }
+
+        .result-item {
+            background: white;
+            border-bottom: 1px solid var(--border-soft);
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .result-item:hover { background: #FCFAF5; }
+        .candidate-name { font-size: 1.4rem; font-weight: bold; margin: 0; }
+        .party-label { font-size: 0.8rem; color: #888; }
+        .amount { font-family: 'Playfair Display'; font-size: 1.3rem; color: var(--dark-gold); text-align: right; }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--dark-gold);
+            cursor: pointer;
+            font-family: inherit;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="landing-page" class="container">
+        <div class="logo">The Archives</div>
+        
+        <div class="hero-section">
+            <h2 style="font-family: 'Playfair Display'; font-style: italic; color: var(--gold);">The Cost of Power</h2>
+            <h1>權力的重量，在於金流的透明</h1>
+            <p>在民主殿堂的背後，每一張選票往往跟隨著複雜的資金運作。我們將 2016 年的原始數據轉化為可供檢索的檔案，讓公民看見誰在資助我們的權力中心。</p>
+        </div>
+
+        <div class="search-area">
+            <input type="text" id="searchInput" placeholder="輸入參選人、地區或政黨名稱...">
+            <button onclick="handleSearch()">檢索檔案</button>
+        </div>
+
+        <div class="quick-links">
+            <span>範例：</span>
+            <a href="#" onclick="quickSearch('柯建銘')">柯建銘</a>
+            <a href="#" onclick="quickSearch('中國國民黨')">中國國民黨</a>
+            <a href="#" onclick="quickSearch('新竹市')">新竹市</a>
+        </div>
+
+        <div class="editors-picks">
+            <h3 style="text-align: center; font-family: 'Playfair Display'; letter-spacing: 3px;">EDITOR'S PICKS</h3>
+            <div class="picks-grid">
+                <div class="pick-card" onclick="quickSearch('柯建銘')">
+                    <div class="tag">Top Revenue</div>
+                    <h4>柯建銘</h4>
+                    <p>年度總收入之冠，洞察傳統政黨領袖的金流結構。</p>
+                </div>
+                <div class="pick-card" onclick="quickSearch('邱志偉')">
+                    <div class="tag">Corporate Support</div>
+                    <h4>邱志偉</h4>
+                    <p>營利事業捐贈佔比極高，分析企業對特定委員會的影響。</p>
+                </div>
+                <div class="pick-card" onclick="quickSearch('民主進步黨')">
+                    <div class="tag">Party Insight</div>
+                    <h4>民主進步黨</h4>
+                    <p>2016 執政元年，全面檢視執政黨的資助來源。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="results-page" class="container hidden">
+        <button class="back-btn" onclick="showLanding()">← 返回檢索首頁</button>
+        
+        <div id="summaryBar" class="summary-bar">
+            </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
+            <div id="resultCount">找到 0 筆結果</div>
+            <select id="sortSelect" onchange="sortData()" style="padding: 5px; font-family: inherit;">
+                <option value="total_desc">按總收入排序 (高至低)</option>
+                <option value="total_asc">按總收入排序 (低至高)</option>
+                <option value="corp_desc">按企業捐贈比例排序</option>
+            </select>
+        </div>
+
+        <div id="resultsList">
+            </div>
+    </div>
+
+    <script>
+        let rawData = [];
+        let filteredData = [];
+
+        // 初始化：讀取同資料夾的 2016.csv
+        async function loadData() {
+            try {
+                const response = await fetch('2016.csv');
+                const csvText = await response.text();
+                rawData = parseCSV(csvText);
+                console.log("數據裝載完成，共", rawData.length, "筆");
+            } catch
