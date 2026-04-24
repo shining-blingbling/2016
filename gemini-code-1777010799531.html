@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ARCHIVES | 2016 政治獻金資料庫</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    <?!= HtmlService.createHtmlOutputFromFile('style.css').getContent(); ?>
+</head>
+<body>
+
+    <section id="landing-page">
+        <div class="overlay"></div>
+        <header>
+            <div class="logo">THE ARCHIVES</div>
+        </header>
+
+        <div class="hero-container">
+            <div class="hero-narrative">
+                <h2 class="gold-text serif-italic">Legacy & Transparency</h2>
+                <h1>權力的清單：誰在資助民主？</h1>
+                <p class="description">
+                    政治獻金不只是數字，它是權力的延伸。在 2016 年的檔案中，我們記錄了每一筆流向立法者的資金。
+                    理解這些金流，是身為公民的「貴族義務（Noblesse Oblige）」。
+                </p>
+            </div>
+
+            <div class="search-cta">
+                <div class="input-group">
+                    <input type="text" id="search-input" placeholder="搜尋參選人、政黨或選區...">
+                    <button onclick="performSearch()">檢索檔案</button>
+                </div>
+                <div class="example-tags">
+                    <span>範例查詢：</span>
+                    <a href="javascript:void(0)" onclick="quickSearch('柯建銘')">柯建銘</a>
+                    <a href="javascript:void(0)" onclick="quickSearch('中國國民黨')">中國國民黨</a>
+                    <a href="javascript:void(0)" onclick="quickSearch('新北市')">新北市</a>
+                </div>
+            </div>
+
+            <div class="editors-picks">
+                <div class="section-divider"><span>Editor's Picks</span></div>
+                <div class="picks-grid">
+                    <div class="pick-item" onclick="quickSearch('柯建銘')">
+                        <small>最高總收入</small>
+                        <h3>柯建銘</h3>
+                        <p>$51,641,147</p>
+                    </div>
+                    <div class="pick-item" onclick="quickSearch('邱志偉')">
+                        <small>企業最愛</small>
+                        <h3>邱志偉</h3>
+                        <p>營利事業捐贈 55%</p>
+                    </div>
+                    <div class="pick-item" onclick="quickSearch('民主進步黨')">
+                        <small>政黨分析</small>
+                        <h3>民主進步黨</h3>
+                        <p>席次與資金分佈</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="results-page" class="hidden">
+        <nav class="top-nav">
+            <button class="back-link" onclick="goHome()">← 返回首頁</button>
+            <div class="nav-logo">THE ARCHIVES</div>
+        </nav>
+
+        <div class="container">
+            <div id="quick-summary" class="summary-card">
+                </div>
+
+            <div class="filter-bar">
+                <div class="results-count">找到 <span id="count-num">0</span> 筆紀錄</div>
+                <div class="sorting">
+                    <select id="sort-select" onchange="applySort()">
+                        <option value="total-desc">總收入：由高到低</option>
+                        <option value="total-asc">總收入：由低到高</option>
+                        <option value="corp-desc">企業捐贈：由高到低</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="results-list" class="list-wrapper">
+                </div>
+
+            <div class="pagination-footer">
+                <button id="load-more" onclick="loadMore()">載入更多紀錄</button>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script>
+        let allData = [];
+        let filteredData = [];
+        let currentIndex = 0;
+        const itemsPerPage = 10;
+
+        // 初始化：抓取 2016.csv
+        window.onload = function() {
+            Papa.parse("2016.csv", {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    allData = results.data.filter(row => row.姓名);
+                }
+            });
+        };
+
+        function quickSearch(val) {
+            document.getElementById('search-input').value = val;
+            performSearch();
+        }
+
+        function performSearch() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            if(!query) return;
+
+            filteredData = allData.filter(item => 
+                item.姓名.toLowerCase().includes(query) || 
+                item.推薦政黨.toLowerCase().includes(query) || 
+                item.地區.toLowerCase().includes(query)
+            );
+
+            currentIndex = 0;
+            showResultsPage();
+        }
+
+        function showResultsPage() {
+            document.getElementById('landing-page').classList.add('hidden');
+            document.getElementById('results-page').classList.remove('hidden');
+            updateSummary();
+            renderList(true);
+        }
+
+        function goHome() {
+            document.getElementById('landing-page').classList.remove('hidden');
+            document.getElementById('results-page').classList.add('hidden');
+        }
+
+        function updateSummary() {
+            const total = filteredData.length;
+            const avg = total > 0 ? Math.round(filteredData.reduce((acc, obj) => acc + parseInt(obj.總收入), 0) / total) : 0;
+            
+            document.getElementById('count-num').innerText = total;
+            document.getElementById('quick-summary').innerHTML = `
+                <div class="summary-item"><span>檢索總數</span><strong>${total}</strong></div>
+                <div class="summary-item"><span>平均收入</span><strong>$${avg.toLocaleString()}</strong></div>
+                <div class="summary-item"><span>資料年份</span><strong>2016</strong></div>
+            `;
+        }
+
+        function renderList(reset) {
+            const list = document.getElementById('results-list');
+            if(reset) list.innerHTML = '';
+
+            const nextSet = filteredData.slice(currentIndex, currentIndex + itemsPerPage);
+            nextSet.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <div class="card-info">
+                        <span class="party-tag">${item.推薦政黨}</span>
+                        <h3>${item.姓名}</h3>
+                        <p class="region">${item.地區}</p>
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <small>企業捐贈</small>
+                            <div class="val">${item.營利事業捐贈比例}</div>
+                        </div>
+                        <div class="stat">
+                            <small>總收入</small>
+                            <div class="val gold-text">$${parseInt(item.總收入).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            currentIndex += itemsPerPage;
+            document.getElementById('load-more').style.display = currentIndex >= filteredData.length ? 'none' : 'block';
+        }
+
+        function loadMore() { renderList(false); }
+
+        function applySort() {
+            const sortVal = document.getElementById('sort-select').value;
+            if(sortVal === 'total-desc') filteredData.sort((a,b) => b.總收入 - a.總收入);
+            if(sortVal === 'total-asc') filteredData.sort((a,b) => a.總收入 - b.總收入);
+            currentIndex = 0;
+            renderList(true);
+        }
+    </script>
+</body>
+</html>
